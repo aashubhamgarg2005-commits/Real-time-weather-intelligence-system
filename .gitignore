@@ -1,0 +1,6 @@
+checkpoints
+s3a-temp
+spark-temp
+__pycache__
+.env
+venv
