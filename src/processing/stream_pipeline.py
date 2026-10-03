@@ -1,61 +1,70 @@
 from .spark_session import spark
 from config.logging import logger
 from .Read_stream_data import raw_stream_df
-from .print_data import print_stream_data
+from .transform_data import transform_weather_data
 import traceback
-from src.storage.create_minio_bucket import MinioBucketManager
-from datetime import datetime
 
 
 def main():
-    """
-    Main function to process streaming data from Kafka
-    and store it in MinIO.
-    """
-
     try:
-        # Initialize MinIO bucket manager
-        minio_manager = MinioBucketManager()
-
-        if not minio_manager.create_bucket():
-            logger.error("Failed to create or access MinIO bucket. Exiting.")
-            return
-
-        # Date-based output path
-        current_date = datetime.now().strftime("%Y-%m-%d")
-
-        output_path = (
-            f"s3a://{minio_manager.bucket_name}"
-            f"/raw_weather_data/{current_date}/"
+        bronze_df = raw_stream_df.selectExpr(
+            "CAST(key AS STRING) AS key",
+            "CAST(value AS STRING) AS value",
+            "topic",
+            "partition",
+            "offset",
+            "timestamp",
+            "timestampType"
         )
 
-        # Checkpoint stored in MinIO
-        checkpoint_path = (
-            f"s3a://{minio_manager.bucket_name}"
-            "/checkpoints/weather_data/"
-        )
-
-        logger.info(f"Output path: {output_path}")
-        logger.info(f"Checkpoint path: {checkpoint_path}")
-        
-
-        query = (
-            raw_stream_df.writeStream
+        bronze_query = (
+            bronze_df.writeStream
             .format("json")
+            .option(
+                "path",
+                "file:///C:/Users/HP/OneDrive/Desktop/weather/data/Bronze"
+            )
+            .option(
+                "checkpointLocation",
+                "file:///C:/Users/HP/OneDrive/Desktop/weather/checkpoint"
+            )
             .outputMode("append")
-            .option("path", output_path)
-            .option("checkpointLocation", checkpoint_path)
             .start()
         )
 
-        logger.info("Streaming query started successfully.")
+        logger.info("Spark streaming started successfully.")
+        #query.awaitTermination()
 
-        query.awaitTermination()
+    except Exception as e:
+        logger.error(f"Error occurred while writing stream data: {e}")
+        logger.error(traceback.format_exc())
+        raise
 
-        print_stream_data()
+    try:
+        # Transform the weather data
+        transformed_df = transform_weather_data(bronze_df)
+        # Write the transformed data to the process layer
+        silver_query = (
+            transformed_df.writeStream
+            .format("parquet")
+            .option(
+                "path",
+                "file:///C:/Users/HP/OneDrive/Desktop/weather/data/process"
+            )
+            .option(
+                "checkpointLocation",
+                "file:///C:/Users/HP/OneDrive/Desktop/weather/checkpoint_process"
+            )
+            .outputMode("append")
+            .start()
+        )
 
-    except Exception:
-        traceback.print_exc()
+        logger.info("Transformed data written to Silver layer successfully.")
+        spark.streams.awaitAnyTermination()
+    except Exception as e:
+        logger.error(f"Error occurred while transforming and writing stream data: {e}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 if __name__ == "__main__":

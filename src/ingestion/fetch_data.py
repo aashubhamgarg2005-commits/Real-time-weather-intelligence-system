@@ -23,13 +23,44 @@ def fetch_weather_data():
                     logger.info(f"Fetching weather data for {district_name} (Lat: {latitude}, Lon: {longitude})")
                     response = requests.get(
                     url=weather_api_url,
-                    params={
-                        "latitude": district["lattitude"],        # district latitude
-                        "longitude": district["longitude"],       # district longitude
-                        "current": "temperature_2m",         # Current Temperature data
-                        "hourly": "temperature_2m",          # Hourly Forecast data
-                        "timezone": "auto"                    # Timezone based on the location
-                    },
+                    params = {
+                    "latitude": district["lattitude"],
+                    "longitude": district["longitude"],
+
+                    "current": (
+                        "temperature_2m,"
+                        "relative_humidity_2m,"
+                        "apparent_temperature,"
+                        "precipitation,"
+                        "rain,"
+                        "showers,"
+                        "snowfall,"
+                        "weather_code,"
+                        "cloud_cover,"
+                        "pressure_msl,"
+                        "wind_speed_10m,"
+                        "wind_direction_10m,"
+                        "wind_gusts_10m"
+                    ),
+
+                    "hourly": (
+                        "temperature_2m,"
+                        "relative_humidity_2m,"
+                        "apparent_temperature,"
+                        "precipitation,"
+                        "rain,"
+                        "showers,"
+                        "snowfall,"
+                        "weather_code,"
+                        "cloud_cover,"
+                        "pressure_msl,"
+                        "wind_speed_10m,"
+                        "wind_direction_10m,"
+                        "wind_gusts_10m"
+                    ),
+
+                    "timezone": "auto"
+                },
                     timeout=30  # Set a timeout for the request
                 )
                     

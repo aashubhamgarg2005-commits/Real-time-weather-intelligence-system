@@ -4,3 +4,6 @@ spark-temp
 __pycache__
 .env
 venv
+data
+checkpoint/
+checkpoint_process/

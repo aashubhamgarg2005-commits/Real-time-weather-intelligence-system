@@ -1,0 +1,261 @@
+/* =========================
+   Global Styles
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f5f7fb;
+    font-family: Arial, sans-serif;
+    color: #1f2937;
+}
+
+
+/* =========================
+   Navbar
+========================= */
+
+.navbar {
+    background: #1e3a5f;
+    padding: 16px 0;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+
+/* =========================
+   Main Heading
+========================= */
+
+main h1 {
+    color: #1e293b;
+}
+
+main > .text-center p {
+    font-size: 1rem;
+}
+
+
+/* =========================
+   District Buttons
+========================= */
+
+.district-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.district-btn {
+    border: 1px solid #d1d5db;
+    background: white;
+    padding: 8px 18px;
+    border-radius: 25px;
+    transition: 0.3s;
+}
+
+.district-btn:hover {
+    background: #e0ecff;
+    border-color: #2563eb;
+}
+
+.district-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+
+/* =========================
+   Current Weather Card
+========================= */
+
+.weather-card {
+    border: none;
+    border-radius: 20px;
+    background: white;
+}
+
+.weather-icon {
+    font-size: 4rem;
+    color: #2563eb;
+}
+
+.temperature {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.weather-detail {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: #f8fafc;
+
+    padding: 18px;
+    border-radius: 15px;
+}
+
+.weather-detail i {
+    font-size: 1.8rem;
+    color: #2563eb;
+}
+
+.weather-detail small {
+    color: #64748b;
+}
+
+.weather-detail h5 {
+    margin: 0;
+    margin-top: 3px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   Rain Alert Card
+========================= */
+
+.alert-card {
+    background: #fff3cd;
+    border-left: 5px solid #f59e0b;
+
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.alert-icon {
+    font-size: 2rem;
+    color: #f59e0b;
+    margin-right: 15px;
+}
+
+
+/* =========================
+   ML Prediction
+========================= */
+
+.prediction-card {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 35px 20px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.prediction-icon {
+    font-size: 2.5rem;
+    color: #7c3aed;
+}
+
+.prediction-value {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #7c3aed;
+
+    margin: 15px 0;
+}
+
+.prediction-badge {
+    background: #ede9fe;
+    color: #6d28d9;
+
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+
+/* =========================
+   Hourly Forecast
+========================= */
+
+.forecast-card {
+    background: white;
+
+    border-radius: 15px;
+
+    padding: 20px 10px;
+
+    height: 100%;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+
+    transition: 0.3s;
+}
+
+.forecast-card:hover {
+    transform: translateY(-5px);
+}
+
+.forecast-card i {
+    font-size: 2rem;
+
+    color: #2563eb;
+
+    margin: 10px 0;
+}
+
+.forecast-card h5 {
+    font-weight: bold;
+}
+
+
+/* =========================
+   System Status
+========================= */
+
+.status-card {
+    background: #dcfce7;
+
+    color: #166534;
+
+    padding: 15px 20px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    font-weight: 500;
+}
+
+.status-card i {
+    margin-right: 8px;
+
+    font-size: 1.2rem;
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+footer {
+    background: #1e3a5f;
+
+    color: #cbd5e1;
+
+    margin-top: 50px;
+
+    font-size: 0.9rem;
+}
+
+
+/* =========================
+   Mobile Responsive
+========================= */
+

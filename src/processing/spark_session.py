@@ -1,89 +1,60 @@
 from pyspark.sql import SparkSession
 
+
+KAFKA_CONNECTOR_JAR = (
+    r"C:\Users\HP\.ivy2.5.2\cache\org.apache.spark"
+    r"\spark-sql-kafka-0-10_2.13\jars"
+    r"\spark-sql-kafka-0-10_2.13-4.2.0.jar"
+)
+
+KAFKA_TOKEN_PROVIDER_JAR = (
+    r"C:\Users\HP\.ivy2.5.2\cache\org.apache.spark"
+    r"\spark-token-provider-kafka-0-10_2.13\jars"
+    r"\spark-token-provider-kafka-0-10_2.13-4.2.0.jar"
+)
+
+KAFKA_CLIENTS_JAR = (
+    r"C:\Users\HP\.ivy2.5.2\cache\org.apache.kafka"
+    r"\kafka-clients\jars"
+    r"\kafka-clients-3.9.2.jar"
+)
+
+COMMONS_POOL_JAR = (
+    r"C:\Users\HP\.ivy2.5.2\cache\org.apache.commons"
+    r"\commons-pool2\jars"
+    r"\commons-pool2-2.13.1.jar"
+)
+
+
 spark = (
     SparkSession.builder
+    .appName("Real-Time Weather Streaming")
     .master("local[2]")
-    .appName("Real-time Weather Data")
 
-    # =========================
-    # Driver
-    # =========================
-    .config("spark.driver.host", "127.0.0.1")
-    .config("spark.driver.bindAddress", "127.0.0.1")
-    .config("spark.blockManager.port", "0")
-
-    # =========================
-    # Network
-    # =========================
-    .config("spark.network.timeout", "120s")
-    .config("spark.executor.heartbeatInterval", "20s")
-
-    # =========================
-    # Kafka + Hadoop AWS
-    # =========================
     .config(
-        "spark.jars.packages",
-        "org.apache.spark:spark-sql-kafka-0-10_2.13:4.2.0,"
-        "org.apache.hadoop:hadoop-aws:3.4.1"
-    )
-
-    # =========================
-    # MinIO
-    # =========================
-    .config(
-        "spark.hadoop.fs.s3a.endpoint",
-        "http://127.0.0.1:9000"
+        "spark.jars",
+        ",".join([
+            KAFKA_CONNECTOR_JAR,
+            KAFKA_TOKEN_PROVIDER_JAR,
+            KAFKA_CLIENTS_JAR,
+            COMMONS_POOL_JAR
+        ])
     )
 
     .config(
-        "spark.hadoop.fs.s3a.access.key",
-        "minioadmin"
+        "spark.driver.extraJavaOptions",
+        "-Djava.library.path=C:/hadoop/bin"
     )
 
     .config(
-        "spark.hadoop.fs.s3a.secret.key",
-        "minioadmin"
+        "spark.executor.extraJavaOptions",
+        "-Djava.library.path=C:/hadoop/bin"
     )
 
-    .config(
-        "spark.hadoop.fs.s3a.path.style.access",
-        "true"
-    )
-
-    .config(
-        "spark.hadoop.fs.s3a.connection.ssl.enabled",
-        "false"
-    )
-
-    .config(
-        "spark.hadoop.fs.s3a.impl",
-        "org.apache.hadoop.fs.s3a.S3AFileSystem"
-    )
-
-    # =========================
-    # IMPORTANT:
-    # Avoid Windows NativeIO
-    # =========================
-    .config(
-        "spark.hadoop.io.native.lib.available",
-        "false"
-    )
-
-    # In-memory S3A buffering
-    .config(
-        "spark.hadoop.fs.s3a.fast.upload",
-        "true"
-    )
-
-    .config(
-        "spark.hadoop.fs.s3a.fast.upload.buffer",
-        "bytebuffer"
-    )
-
-    .config(
-        "spark.hadoop.fs.s3a.fast.upload.active.blocks",
-        "2"
-    )
+    .config("spark.hadoop.native.lib", "true")
+    .config("spark.hadoop.io.native.lib.available", "true")
+    .config("spark.hadoop.home.dir", r"C:\hadoop")
+    .config("spark.hadoop.native.lib.path", r"C:\hadoop\bin")
 
     .getOrCreate()
 )
