@@ -1,207 +1,168 @@
 // =========================
-// District Weather Data
+// API Configuration
 // =========================
 
-const weatherData = {
-    Meerut: {
-        temperature: 28,
-        condition: "Light Rain",
-        humidity: 82,
-        windSpeed: "12 km/h",
-        pressure: "1008 hPa",
-        rainfall: "2.4 mm",
-        prediction: 78,
-        alert: "Moderate chance of rain in the next few hours.",
-        forecast: [
-            { time: "2 PM", temp: "28°C", rain: 70 },
-            { time: "3 PM", temp: "27°C", rain: 80 },
-            { time: "4 PM", temp: "26°C", rain: 85 },
-            { time: "5 PM", temp: "25°C", rain: 75 },
-            { time: "6 PM", temp: "25°C", rain: 60 }
-        ]
-    },
+const API_BASE_URL = "http://127.0.0.1:8000";
 
-    Ghaziabad: {
-        temperature: 30,
-        condition: "Cloudy",
-        humidity: 75,
-        windSpeed: "10 km/h",
-        pressure: "1010 hPa",
-        rainfall: "0.8 mm",
-        prediction: 55,
-        alert: "Moderate possibility of rain.",
-        forecast: [
-            { time: "2 PM", temp: "30°C", rain: 40 },
-            { time: "3 PM", temp: "29°C", rain: 50 },
-            { time: "4 PM", temp: "28°C", rain: 60 },
-            { time: "5 PM", temp: "27°C", rain: 55 },
-            { time: "6 PM", temp: "26°C", rain: 45 }
-        ]
-    },
-
-    Noida: {
-        temperature: 31,
-        condition: "Partly Cloudy",
-        humidity: 68,
-        windSpeed: "14 km/h",
-        pressure: "1009 hPa",
-        rainfall: "0.0 mm",
-        prediction: 35,
-        alert: "Low chance of rain in the next few hours.",
-        forecast: [
-            { time: "2 PM", temp: "31°C", rain: 25 },
-            { time: "3 PM", temp: "30°C", rain: 30 },
-            { time: "4 PM", temp: "29°C", rain: 40 },
-            { time: "5 PM", temp: "28°C", rain: 35 },
-            { time: "6 PM", temp: "27°C", rain: 30 }
-        ]
-    },
-
-    Lucknow: {
-        temperature: 29,
-        condition: "Rain",
-        humidity: 88,
-        windSpeed: "16 km/h",
-        pressure: "1005 hPa",
-        rainfall: "5.2 mm",
-        prediction: 88,
-        alert: "High probability of rain. Stay alert.",
-        forecast: [
-            { time: "2 PM", temp: "29°C", rain: 85 },
-            { time: "3 PM", temp: "28°C", rain: 90 },
-            { time: "4 PM", temp: "27°C", rain: 88 },
-            { time: "5 PM", temp: "26°C", rain: 80 },
-            { time: "6 PM", temp: "26°C", rain: 70 }
-        ]
-    },
-
-    Agra: {
-        temperature: 33,
-        condition: "Sunny",
-        humidity: 52,
-        windSpeed: "9 km/h",
-        pressure: "1012 hPa",
-        rainfall: "0.0 mm",
-        prediction: 15,
-        alert: "No significant rain expected.",
-        forecast: [
-            { time: "2 PM", temp: "33°C", rain: 10 },
-            { time: "3 PM", temp: "32°C", rain: 15 },
-            { time: "4 PM", temp: "31°C", rain: 20 },
-            { time: "5 PM", temp: "30°C", rain: 18 },
-            { time: "6 PM", temp: "29°C", rain: 12 }
-        ]
-    },
-
-    Kanpur: {
-        temperature: 30,
-        condition: "Cloudy",
-        humidity: 78,
-        windSpeed: "13 km/h",
-        pressure: "1007 hPa",
-        rainfall: "1.2 mm",
-        prediction: 65,
-        alert: "High chance of rain in the next few hours.",
-        forecast: [
-            { time: "2 PM", temp: "30°C", rain: 60 },
-            { time: "3 PM", temp: "29°C", rain: 70 },
-            { time: "4 PM", temp: "28°C", rain: 72 },
-            { time: "5 PM", temp: "27°C", rain: 65 },
-            { time: "6 PM", temp: "27°C", rain: 55 }
-        ]
-    },
-
-    Varanasi: {
-        temperature: 27,
-        condition: "Heavy Rain",
-        humidity: 92,
-        windSpeed: "20 km/h",
-        pressure: "1003 hPa",
-        rainfall: "8.5 mm",
-        prediction: 92,
-        alert: "Severe rain probability. Please stay alert.",
-        forecast: [
-            { time: "2 PM", temp: "27°C", rain: 90 },
-            { time: "3 PM", temp: "26°C", rain: 95 },
-            { time: "4 PM", temp: "25°C", rain: 92 },
-            { time: "5 PM", temp: "25°C", rain: 85 },
-            { time: "6 PM", temp: "24°C", rain: 75 }
-        ]
-    }
-};
+let selectedDistrict = "meerut";
 
 
 // =========================
 // Update Weather UI
 // =========================
 
-function updateWeather(district) {
-
-    const data = weatherData[district];
+function updateWeather(data) {
 
     document.getElementById("temperature").textContent =
-        data.temperature;
+        formatNumber(data.temperature_2m);
 
     document.getElementById("condition").textContent =
-        data.condition;
+        getWeatherCondition(data);
 
     document.getElementById("districtName").textContent =
-        district;
+        capitalize(data.district);
 
     document.getElementById("humidity").textContent =
-        data.humidity + "%";
+        formatNumber(data.relative_humidity_2m) + "%";
 
     document.getElementById("windSpeed").textContent =
-        data.windSpeed;
+        formatNumber(data.wind_speed_10m) + " km/h";
 
     document.getElementById("pressure").textContent =
-        data.pressure;
+        formatNumber(data.pressure_msl) + " hPa";
 
     document.getElementById("rainfall").textContent =
-        data.rainfall;
+        formatNumber(data.precipitation) + " mm";
 
-    document.getElementById("mlPrediction").textContent =
-        data.prediction;
+    updateRainAlert(data);
 
-    document.getElementById("alertMessage").textContent =
-        data.alert;
-
-    updateForecast(data.forecast);
-    updateLastUpdated();
+    updateLastUpdated(data.time);
 }
 
 
 // =========================
-// Update Forecast Cards
+// Fetch Weather From Backend
 // =========================
 
-function updateForecast(forecast) {
+async function fetchWeather(district) {
 
-    const container =
-        document.getElementById("forecastContainer");
+    try {
 
-    container.innerHTML = "";
+        console.log(
+            `Fetching weather for ${district}...`
+        );
 
-    forecast.forEach(item => {
+        const response = await fetch(
+            `${API_BASE_URL}/api/weather/${district}`
+        );
 
-        container.innerHTML += `
-            <div class="col-6 col-md">
+        if (!response.ok) {
 
-                <div class="forecast-card text-center">
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
 
-                    <h6>${item.time}</h6>
+        const data = await response.json();
 
-                    <i class="bi bi-cloud-rain-fill"></i>
+        console.log("Weather data:", data);
 
-                    <h5>${item.temp}</h5>
+        updateWeather(data);
 
-                    <span>${item.rain}% 🌧️</span>
+    } catch (error) {
 
-                </div>
+        console.error(
+            "Failed to fetch weather:",
+            error
+        );
 
-            </div>
-        `;
-    });
+        document.getElementById("condition").textContent =
+            "Unable to fetch weather";
+
+        document.getElementById("alertMessage").textContent =
+            "Unable to connect to the weather server.";
+    }
+}
+
+
+// =========================
+// Weather Condition
+// =========================
+
+function getWeatherCondition(data) {
+
+    const precipitation =
+        Number(data.precipitation || 0);
+
+    const rain =
+        Number(data.rain || 0);
+
+    const showers =
+        Number(data.showers || 0);
+
+    const cloudCover =
+        Number(data.cloud_cover || 0);
+
+
+    if (rain > 0 || showers > 0) {
+
+        if (rain >= 5) {
+            return "Heavy Rain";
+        }
+
+        return "Rain";
+    }
+
+
+    if (precipitation > 0) {
+        return "Light Rain";
+    }
+
+
+    if (cloudCover >= 75) {
+        return "Cloudy";
+    }
+
+
+    if (cloudCover >= 40) {
+        return "Partly Cloudy";
+    }
+
+
+    return "Clear Sky";
+}
+
+
+// =========================
+// Rain Alert
+// =========================
+
+function updateRainAlert(data) {
+
+    const precipitation =
+        Number(data.precipitation || 0);
+
+    const rain =
+        Number(data.rain || 0);
+
+    const showers =
+        Number(data.showers || 0);
+
+
+    if (
+        precipitation > 0 ||
+        rain > 0 ||
+        showers > 0
+    ) {
+
+        document.getElementById("alertMessage").textContent =
+            "Rain is currently being detected in this district.";
+
+    } else {
+
+        document.getElementById("alertMessage").textContent =
+            "No rainfall is currently being detected.";
+    }
 }
 
 
@@ -212,23 +173,33 @@ function updateForecast(forecast) {
 const districtButtons =
     document.querySelectorAll(".district-btn");
 
+
 districtButtons.forEach(button => {
 
     button.addEventListener("click", function () {
 
         // Remove active class
-        districtButtons.forEach(btn =>
-            btn.classList.remove("active")
-        );
+        districtButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
 
         // Add active class
         this.classList.add("active");
 
-        // Get district name
-        const district = this.textContent.trim();
 
-        // Update UI
-        updateWeather(district);
+        // Get district name
+        selectedDistrict =
+            this.textContent.trim().toLowerCase();
+
+
+        console.log(
+            `Selected district: ${selectedDistrict}`
+        );
+
+
+        // Fetch live weather
+        fetchWeather(selectedDistrict);
     });
 
 });
@@ -238,12 +209,22 @@ districtButtons.forEach(button => {
 // Last Updated Time
 // =========================
 
-function updateLastUpdated() {
+function updateLastUpdated(time) {
 
-    const now = new Date();
+    if (!time) {
+
+        document.getElementById("lastUpdated").textContent =
+            "--:--";
+
+        return;
+    }
+
+
+    const date = new Date(time);
+
 
     document.getElementById("lastUpdated").textContent =
-        now.toLocaleTimeString([], {
+        date.toLocaleTimeString("en-IN", {
             hour: "2-digit",
             minute: "2-digit"
         });
@@ -251,7 +232,64 @@ function updateLastUpdated() {
 
 
 // =========================
+// Format Number
+// =========================
+
+function formatNumber(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "--";
+    }
+
+
+    const number = Number(value);
+
+
+    if (Number.isNaN(number)) {
+        return "--";
+    }
+
+
+    return number.toFixed(1);
+}
+
+
+// =========================
+// Capitalize District
+// =========================
+
+function capitalize(text) {
+
+    if (!text) {
+        return "--";
+    }
+
+
+    return text.charAt(0).toUpperCase() +
+           text.slice(1);
+}
+
+
+// =========================
+// Auto Refresh
+// =========================
+
+setInterval(() => {
+
+    console.log(
+        `Refreshing ${selectedDistrict}...`
+    );
+
+    fetchWeather(selectedDistrict);
+
+}, 30000);
+
+
+// =========================
 // Initial Load
 // =========================
 
-updateLastUpdated();
+fetchWeather(selectedDistrict);

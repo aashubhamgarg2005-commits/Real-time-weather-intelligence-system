@@ -1,12 +1,20 @@
+
 from .spark_session import spark
 from config.logging import logger
 from .Read_stream_data import raw_stream_df
 from .transform_data import transform_weather_data
+from .write_database import write_to_database
+
 import traceback
 
 
 def main():
+
     try:
+        # =========================================================
+        # 1. BRONZE LAYER
+        # =========================================================
+
         bronze_df = raw_stream_df.selectExpr(
             "CAST(key AS STRING) AS key",
             "CAST(value AS STRING) AS value",
@@ -32,18 +40,18 @@ def main():
             .start()
         )
 
-        logger.info("Spark streaming started successfully.")
-        #query.awaitTermination()
+        logger.info("Bronze streaming started successfully.")
 
-    except Exception as e:
-        logger.error(f"Error occurred while writing stream data: {e}")
-        logger.error(traceback.format_exc())
-        raise
+        # =========================================================
+        # 2. TRANSFORM DATA
+        # =========================================================
 
-    try:
-        # Transform the weather data
         transformed_df = transform_weather_data(bronze_df)
-        # Write the transformed data to the process layer
+
+        # =========================================================
+        # 3. SILVER LAYER
+        # =========================================================
+
         silver_query = (
             transformed_df.writeStream
             .format("parquet")
@@ -59,11 +67,40 @@ def main():
             .start()
         )
 
-        logger.info("Transformed data written to Silver layer successfully.")
+        logger.info("Silver streaming started successfully.")
+
+        # =========================================================
+        # 4. POSTGRESQL / GOLD LAYER
+        # =========================================================
+
+        write_query = (
+            transformed_df.writeStream
+            .foreachBatch(write_to_database)
+            .option(
+                "checkpointLocation",
+                "file:///C:/Users/HP/OneDrive/Desktop/weather/checkpoint_database"
+            )
+            .start()
+        )
+
+        logger.info("PostgreSQL streaming started successfully.")
+
+        # =========================================================
+        # 5. WAIT FOR STREAMING
+        # =========================================================
+
         spark.streams.awaitAnyTermination()
+
     except Exception as e:
-        logger.error(f"Error occurred while transforming and writing stream data: {e}")
-        logger.error(traceback.format_exc())
+
+        logger.error(
+            f"Error occurred in streaming pipeline: {e}"
+        )
+
+        logger.error(
+            traceback.format_exc()
+        )
+
         raise
 
 
