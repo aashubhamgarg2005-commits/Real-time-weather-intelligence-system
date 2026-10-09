@@ -165,7 +165,7 @@ The script creates:
 Clone the repository and install the required Python dependencies:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/aashubhamgarg2005-commits/Real-time-weather-intelligence-system
 cd weather
 python -m venv venv
 venv\Scripts\activate
