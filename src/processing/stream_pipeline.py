@@ -4,7 +4,6 @@ from config.logging import logger
 from .Read_stream_data import raw_stream_df
 from .transform_data import transform_weather_data
 from .write_database import write_to_database
-
 import traceback
 
 
@@ -84,25 +83,14 @@ def main():
         )
 
         logger.info("PostgreSQL streaming started successfully.")
-
-        # =========================================================
-        # 5. WAIT FOR STREAMING
-        # =========================================================
-
         spark.streams.awaitAnyTermination()
 
     except Exception as e:
-
-        logger.error(
-            f"Error occurred in streaming pipeline: {e}"
-        )
-
-        logger.error(
-            traceback.format_exc()
-        )
-
+        logger.error(f"Error occured {e}")
+        logger.error(traceback.format_exc())
         raise
-
+    
 
 if __name__ == "__main__":
     main()
+    
